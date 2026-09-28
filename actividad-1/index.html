@@ -374,8 +374,8 @@ body.game .sb{display:grid}
   <div class="video">
     <div id="ytf"></div>
   </div>
-  <a class="ytlink" href="https://www.youtube.com/watch?v=TiNUaHXsjBA&t=5s" target="_blank" rel="noopener">Abrir en YouTube</a>
-  <a class="player" href="https://www.youtube.com/watch?v=TiNUaHXsjBA&t=5s" target="_blank" rel="noopener" aria-label="Ver el video «La zanahoria más grande» en YouTube">
+  <a class="ytlink" href="https://www.youtube.com/watch?v=TiNUaHXsjBA&t=35s" target="_blank" rel="noopener">Abrir en YouTube</a>
+  <a class="player" href="https://www.youtube.com/watch?v=TiNUaHXsjBA&t=35s" target="_blank" rel="noopener" aria-label="Ver el video «La zanahoria más grande» en YouTube">
     <span class="play" aria-hidden="true">
       <svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
     </span>
@@ -858,10 +858,10 @@ body.game .sb{display:grid}
     ytIdx=0;
     ytPlayer=new YT.Player('ytf',{
       videoId:YT_IDS[ytIdx],
-      playerVars:{start:5,end:198,rel:0,modestbranding:1,playsinline:1},
+      playerVars:{start:35,end:227,rel:0,modestbranding:1,playsinline:1},
       events:{onError:function(){
         ytIdx++;
-        if(ytIdx<YT_IDS.length) ytPlayer.loadVideoById({videoId:YT_IDS[ytIdx],startSeconds:5,endSeconds:198});
+        if(ytIdx<YT_IDS.length) ytPlayer.loadVideoById({videoId:YT_IDS[ytIdx],startSeconds:35,endSeconds:227});
         else useFallback();
       }}
     });
