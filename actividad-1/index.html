@@ -372,7 +372,7 @@ body.game .sb{display:grid}
   <h2 class="title">Reflexión</h2>
   <p class="vtitle">La zanahoria más grande</p>
   <div class="video">
-    <iframe id="ytf" data-src="https://www.youtube.com/embed/TiNUaHXsjBA?start=5&end=198&rel=0&modestbranding=1&playsinline=1" title="La zanahoria más grande" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    <div id="ytf"></div>
   </div>
   <a class="ytlink" href="https://www.youtube.com/watch?v=TiNUaHXsjBA&t=5s" target="_blank" rel="noopener">Abrir en YouTube</a>
   <a class="player" href="https://www.youtube.com/watch?v=TiNUaHXsjBA&t=5s" target="_blank" rel="noopener" aria-label="Ver el video «La zanahoria más grande» en YouTube">
@@ -797,6 +797,7 @@ body.game .sb{display:grid}
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 (function(){
   var $=function(s,r){return (r||document).querySelector(s)};
@@ -839,20 +840,42 @@ body.game .sb{display:grid}
   function resetTimer(){stopTick();timer.left=TOTAL;paintTimer();}
 
   /* ----- Video de YouTube dentro de la página ----- */
+  /* Si el dueño bloquea la incrustación de un video (error de YT), se prueba
+     con otras copias del mismo video antes de mostrar el enlace externo. */
   var vslide=$('.s-video');
+  var YT_IDS=['TiNUaHXsjBA','gcTHdAV2L9Q','5SQd6kSpyVI'];
+  var ytPlayer=null, ytReady=false, wantLoad=false, ytIdx=0;
   function useFallback(){
     vslide.classList.add('vfb');
-    var f=$('#ytf'); if(f) f.removeAttribute('src');
+    if(ytPlayer){try{ytPlayer.destroy();}catch(e){} ytPlayer=null;}
   }
   if(location.protocol==='file:') useFallback();
   document.addEventListener('securitypolicyviolation',function(e){
     if(/frame|child/.test(e.violatedDirective||'')) useFallback();
   });
-  function loadFrames(s){
-    if(s.classList.contains('vfb')) return;
-    $$('iframe[data-src]',s).forEach(function(f){if(!f.getAttribute('src'))f.setAttribute('src',f.getAttribute('data-src'));});
+  function createYtPlayer(){
+    if(vslide.classList.contains('vfb')||!window.YT||!YT.Player) return;
+    ytIdx=0;
+    ytPlayer=new YT.Player('ytf',{
+      videoId:YT_IDS[ytIdx],
+      playerVars:{start:5,end:198,rel:0,modestbranding:1,playsinline:1},
+      events:{onError:function(){
+        ytIdx++;
+        if(ytIdx<YT_IDS.length) ytPlayer.loadVideoById({videoId:YT_IDS[ytIdx],startSeconds:5,endSeconds:198});
+        else useFallback();
+      }}
+    });
   }
-  function unloadFrames(s){$$('iframe[data-src]',s).forEach(function(f){f.removeAttribute('src');});}
+  window.onYouTubeIframeAPIReady=function(){ytReady=true; if(wantLoad) createYtPlayer();};
+  function loadFrames(s){
+    if(s!==vslide||s.classList.contains('vfb')) return;
+    if(ytPlayer){ if(ytPlayer.playVideo) ytPlayer.playVideo(); return; }
+    wantLoad=true;
+    if(ytReady) createYtPlayer();
+  }
+  function unloadFrames(s){
+    if(s===vslide&&ytPlayer&&ytPlayer.pauseVideo){try{ytPlayer.pauseVideo();}catch(e){}}
+  }
 
   /* ----- Gráfica del marcador final ----- */
   function renderChart(){
